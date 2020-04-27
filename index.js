@@ -5,26 +5,27 @@ const url = "https://cfw-takehome.developers.workers.dev/api/variants";
 
 // don't edit below here
 addEventListener("fetch", event => {
-  if (event.request.url.indexOf(url) > -1) {
-    event.respondWith(fetchAndModify(event.request));
-  }
+  event.respondWith(fetchAndModify(event.request));
 });
 
 async function fetchAndModify(request) {
   // 'a' or 'b', set below
   let group;
 
-  // Send the request on to the origin server.
-  const response = await fetch(request);
-
   // Determine which group this request is in.
   const cookie = request.headers.get("Cookie");
 
-  // Get headers into a var to possibly change.
-  const conditionalHeaders = new Headers(response.headers);
+  // Read variants links.
+  const responseInit = await fetch(url).then(response => {
+    if (response.status !== 200) {
+      console.log(response.status);
+      return Promise.reject(new Error(response.statusText));
+    }
+    return response.json();
+  });
 
-  // Read response body.
-  const text = await response.text();
+  const links = responseInit.variants;
+  const conditionalHeaders = new Headers(responseInit.headers);
 
   if (cookie && cookie.includes(`${name}=a`)) {
     group = "a";
@@ -38,13 +39,54 @@ async function fetchAndModify(request) {
     conditionalHeaders.append("Set-Cookie", `${name}=${group}`);
   }
 
-  let newResponse = new Response(text, {
+  if (group === "a") {
+    var response = await fetch(links[0]).then(response => response.text());
+  } else {
+    var response = await fetch(links[1]).then(response => response.text());
+  }
+
+  conditionalHeaders.append("Content-Type", "text/html");
+  conditionalHeaders.append("Content-Type", "text/html");
+
+  let newResponse = new Response(response, {
     status: response.status,
     statusText: response.statusText,
-    headers: conditionalHeaders
+    headers: conditionalHeaders,
+    credentials: "include"
   });
 
   let rewritter = new HTMLRewriter()
+    .on("title", {
+      element(element) {
+        if (group === "a") {
+          element.setInnerContent("Classical | Alfian Cloudflare Test");
+        } else if (group === "b") {
+          element.setInnerContent("Indie | Alfian Cloudflare Test");
+        }
+      }
+    })
+    .on("h1#title", {
+      element(element) {
+        if (group === "a") {
+          element.setInnerContent("Sir Classical");
+        } else if (group === "b") {
+          element.setInnerContent("Aktifeast");
+        }
+      }
+    })
+    .on("p#description", {
+      element(element) {
+        if (group === "a") {
+          element.setInnerContent(
+            "Bonjour, gentleman! You're destined to be a classical connoisseurs"
+          );
+        } else if (group === "b") {
+          element.setInnerContent(
+            "Hi, folks! You're a super special unique the one and only indie guy in the world"
+          );
+        }
+      }
+    })
     .on("a#url", {
       element(element) {
         if (element.hasAttribute("href")) {
@@ -64,37 +106,6 @@ async function fetchAndModify(request) {
           element.setInnerContent("Let's enjoy some classical, Monsieur!");
         } else if (group === "b") {
           element.setInnerContent("Because civilization, will never die...");
-        }
-      }
-    })
-    .on("p#description", {
-      element(element) {
-        if (group === "a") {
-          element.setInnerContent(
-            "Bonjour, gentleman! You're destined to be a classical connoisseurs"
-          );
-        } else if (group === "b") {
-          element.setInnerContent(
-            "Hi, folks! You're a super special unique the one and only indie guy in the world"
-          );
-        }
-      }
-    })
-    .on("title", {
-      element(element) {
-        if (group === "a") {
-          element.setInnerContent("Classical | Alfian Cloudflare Test");
-        } else if (group === "b") {
-          element.setInnerContent("Indie | Alfian Cloudflare Test");
-        }
-      }
-    })
-    .on("h1#title", {
-      element(element) {
-        if (group === "a") {
-          element.setInnerContent("Sir Classical");
-        } else if (group === "b") {
-          element.setInnerContent("Aktifeast");
         }
       }
     });
