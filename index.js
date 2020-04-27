@@ -18,7 +18,6 @@ async function fetchAndModify(request) {
   // Read variants links.
   const responseInit = await fetch(url).then(response => {
     if (response.status !== 200) {
-      console.log(response.status);
       return Promise.reject(new Error(response.statusText));
     }
     return response.json();
