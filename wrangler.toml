@@ -1,6 +1,6 @@
-name = "{{project-name}}"
+name = "cloudflare-alfin"
 type = "javascript"
-account_id = ""
+account_id = "3b3fcb68d1d15b718307d919944e12a0"
 workers_dev = true
 route = ""
-zone_id = ""
+zone_id = "4c55fbcbe08c9d16271d9ccb5ae6c703"
