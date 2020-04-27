@@ -1,9 +1,8 @@
-// test name. Used to set a cookie to a value of 'a' or 'b'
+// Cookie name. Used to set a cookie to a value of 'a' or 'b'
 const name = "music-cookie";
-// url where this should apply
+// URL of the take home test
 const url = "https://cfw-takehome.developers.workers.dev/api/variants";
 
-// don't edit below here
 addEventListener("fetch", event => {
   event.respondWith(fetchAndModify(event.request));
 });
@@ -33,18 +32,17 @@ async function fetchAndModify(request) {
   } else {
     // 50/50 Split
     group = Math.random() < 0.5 ? "a" : "b";
-    // The experiment was newly-assigned, so add a Set-Cookie header
-    // to the response.
+    // The experiment was newly-assigned, so add a Set-Cookie header to the response.
     conditionalHeaders.append("Set-Cookie", `${name}=${group}`);
   }
 
+  // Fetch url based on cookie
   if (group === "a") {
     var response = await fetch(links[0]).then(response => response.text());
   } else {
     var response = await fetch(links[1]).then(response => response.text());
   }
 
-  conditionalHeaders.append("Content-Type", "text/html");
   conditionalHeaders.append("Content-Type", "text/html");
 
   let newResponse = new Response(response, {
@@ -54,6 +52,7 @@ async function fetchAndModify(request) {
     credentials: "include"
   });
 
+  // Rewrite HTML response
   let rewritter = new HTMLRewriter()
     .on("title", {
       element(element) {
