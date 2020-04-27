@@ -2,7 +2,7 @@
 
 ## Deployed Project Links
 
-- With custom domain: [tanam.online/cloudflare](https://tanam.online/cloudflare/)
+- With custom domain: [tanam.online/cloudflare](https://tanam.online/cloudflare)
 - With default Wrangler domain: [cloudflare-alfin.alfinm01.workers.dev](https://cloudflare-alfin.alfinm01.workers.dev/)
 
 ## What is it?
